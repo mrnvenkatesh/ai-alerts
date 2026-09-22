@@ -1,0 +1,28 @@
+# Use official lightweight Python image
+FROM python:3.11-slim
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements and install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy source code
+COPY src/ ./src/
+COPY .env.example .env.example
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app \
+    TIMEZONE=Asia/Kolkata
+
+# Default entrypoint runs immediate pipeline for serverless jobs / container execution
+ENTRYPOINT ["python", "src/scheduler.py"]
+CMD ["--now"]
