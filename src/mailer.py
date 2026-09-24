@@ -8,6 +8,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import logging
 import os
+import re
 import smtplib
 from typing import Optional
 
@@ -290,7 +291,8 @@ class DigestMailer:
         self.smtp_user = os.getenv("SMTP_USER", "")
         self.smtp_pass = os.getenv("SMTP_PASS", "")
         self.sender_email = os.getenv("SENDER_EMAIL", "digest@genai.local")
-        self.recipient_email = os.getenv("RECIPIENT_EMAIL", "")
+        raw_recipients = os.getenv("RECIPIENT_EMAIL", "")
+        self.recipient_list = [r.strip() for r in re.split(r"[,;]", raw_recipients) if r.strip()]
 
     def render_html(self, content: DailyDigestContent) -> str:
         """Renders HTML email template."""
@@ -327,7 +329,7 @@ class DigestMailer:
         html_body = self.render_html(content)
         text_body = self.render_text(content)
 
-        if dry_run or not self.recipient_email or not self.smtp_host:
+        if dry_run or not self.recipient_list or not self.smtp_host:
             logger.info("Dry-run mode active or SMTP credentials missing. Writing output to local files.")
             self.save_local_preview(content)
             return True
@@ -337,7 +339,7 @@ class DigestMailer:
         msg = MIMEMultipart("alternative")
         msg["Subject"] = subject
         msg["From"] = self.sender_email
-        msg["To"] = self.recipient_email
+        msg["To"] = ", ".join(self.recipient_list)
 
         part1 = MIMEText(text_body, "plain", "utf-8")
         part2 = MIMEText(html_body, "html", "utf-8")
@@ -357,9 +359,9 @@ class DigestMailer:
             if self.smtp_user and self.smtp_pass:
                 server.login(self.smtp_user, self.smtp_pass)
 
-            server.sendmail(self.sender_email, [self.recipient_email], msg.as_string())
+            server.sendmail(self.sender_email, self.recipient_list, msg.as_string())
             server.quit()
-            logger.info(f"Successfully delivered email digest to {self.recipient_email}")
+            logger.info(f"Successfully delivered email digest to {len(self.recipient_list)} recipient(s): {', '.join(self.recipient_list)}")
             return True
         except Exception as e:
             logger.error(f"Failed to deliver email via SMTP: {e}")
