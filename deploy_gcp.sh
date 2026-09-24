@@ -13,7 +13,7 @@ if ! command -v gcloud &> /dev/null; then
 fi
 
 # Load variables or prompt
-PROJECT_ID=$(gcloud config get-value project 2>/dev/null)
+PROJECT_ID="${GCP_PROJECT_ID:-ai-alerts-509405}"
 REGION="${GCP_REGION:-us-central1}"
 JOB_NAME="genai-daily-briefing"
 REPOSITORY_NAME="genai-briefing-repo"

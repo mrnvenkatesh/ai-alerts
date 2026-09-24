@@ -141,14 +141,28 @@ Raw News Items Data:
 {json.dumps(items_payload, indent=2)}
 """
 
-        response = client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=prompt,
-            config=types.GenerateContentConfig(
-                response_mime_type="application/json",
-                temperature=0.2,
-            )
-        )
+        # Try reliable Gemini models
+        response = None
+        for model_name in ["gemini-3.5-flash", "gemini-3.1-flash-lite", "gemini-flash-latest"]:
+            try:
+                logger.info(f"Sending prompt to Gemini model: {model_name}")
+                resp = client.models.generate_content(
+                    model=model_name,
+                    contents=prompt,
+                    config=types.GenerateContentConfig(
+                        response_mime_type="application/json",
+                        temperature=0.2,
+                    )
+                )
+                if resp and resp.text:
+                    response = resp
+                    break
+            except Exception as e:
+                logger.warning(f"Gemini model {model_name} failed: {e}. Trying next model...")
+                continue
+
+        if not response or not response.text:
+            raise RuntimeError("All Gemini model generation attempts failed.")
 
         raw_json = response.text
         data = json.loads(raw_json)
