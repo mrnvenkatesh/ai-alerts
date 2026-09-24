@@ -290,7 +290,7 @@ class DigestMailer:
         self.smtp_port = int(os.getenv("SMTP_PORT", "587"))
         self.smtp_user = os.getenv("SMTP_USER", "")
         self.smtp_pass = os.getenv("SMTP_PASS", "")
-        self.sender_email = os.getenv("SENDER_EMAIL", "digest@genai.local")
+        self.sender_email = (os.getenv("SENDER_EMAIL", "").strip()) or self.smtp_user or "digest@genai.local"
         raw_recipients = os.getenv("RECIPIENT_EMAIL", "")
         self.recipient_list = [r.strip() for r in re.split(r"[,;]", raw_recipients) if r.strip()]
 
