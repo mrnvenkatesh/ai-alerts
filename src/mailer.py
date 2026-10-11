@@ -27,167 +27,302 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Daily GenAI Intelligence Briefing — {{ content.date_str }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
       padding: 0;
-      background-color: #0f172a;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: #060813;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       color: #e2e8f0;
       -webkit-font-smoothing: antialiased;
     }
     .wrapper {
       width: 100%;
-      background-color: #0f172a;
-      padding: 30px 15px;
+      background-color: #060813;
+      background-image: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.18) 0%, rgba(6, 8, 19, 0) 65%);
+      padding: 40px 15px;
       box-sizing: border-box;
     }
     .container {
       max-width: 680px;
       margin: 0 auto;
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 12px;
+      background: #0b101e;
+      border: 1px solid rgba(99, 102, 241, 0.22);
+      border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 35px rgba(99, 102, 241, 0.12);
+    }
+    .energy-bar {
+      height: 3px;
+      background: linear-gradient(90deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
+      width: 100%;
     }
     .header {
-      background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-      padding: 32px 28px;
+      background: linear-gradient(180deg, rgba(30, 27, 75, 0.6) 0%, rgba(11, 16, 30, 0.95) 100%);
+      padding: 34px 32px 26px;
       text-align: left;
+      border-bottom: 1px solid rgba(99, 102, 241, 0.15);
+    }
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
     }
     .header-badge {
-      display: inline-block;
-      background: rgba(255, 255, 255, 0.2);
-      color: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.35);
+      color: #a5b4fc;
+      font-family: 'JetBrains Mono', monospace;
       font-size: 11px;
       font-weight: 700;
-      letter-spacing: 1px;
+      letter-spacing: 1.2px;
       text-transform: uppercase;
-      padding: 4px 10px;
+      padding: 5px 12px;
       border-radius: 20px;
-      margin-bottom: 12px;
+    }
+    .pulse-dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+      margin-right: 8px;
+    }
+    .system-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #64748b;
+      letter-spacing: 0.5px;
     }
     .header h1 {
       margin: 0;
+      font-family: 'Outfit', sans-serif;
       color: #ffffff;
-      font-size: 24px;
+      font-size: 27px;
       font-weight: 800;
-      line-height: 1.3;
+      line-height: 1.25;
+      letter-spacing: -0.3px;
     }
-    .header p {
+    .gradient-text {
+      background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .header-date {
       margin: 8px 0 0 0;
-      color: rgba(255, 255, 255, 0.85);
-      font-size: 14px;
-    }
-    .section {
-      padding: 24px 28px;
-      border-bottom: 1px solid #334155;
-    }
-    .section-title {
-      font-size: 14px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
       color: #94a3b8;
-      margin-top: 0;
-      margin-bottom: 16px;
+      font-size: 14px;
       display: flex;
       align-items: center;
+      gap: 6px;
+    }
+    .telemetry-strip {
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 12px;
+      color: #94a3b8;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .telemetry-chip {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-radius: 6px;
+      padding: 4px 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .telemetry-chip strong {
+      color: #38bdf8;
+    }
+    .section {
+      padding: 26px 30px;
+      border-bottom: 1px solid rgba(99, 102, 241, 0.12);
+    }
+    .section-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: #818cf8;
+      margin-top: 0;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-title-icon {
+      font-size: 15px;
     }
     .macro-box {
-      background: rgba(59, 130, 246, 0.1);
-      border-left: 4px solid #3b82f6;
-      border-radius: 6px;
-      padding: 16px 20px;
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.85) 100%);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-left: 4px solid #38bdf8;
+      border-radius: 10px;
+      padding: 20px 22px;
       color: #f1f5f9;
       font-size: 15px;
-      line-height: 1.6;
+      line-height: 1.65;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
     }
     .card {
-      background: #0f172a;
-      border: 1px solid #334155;
-      border-radius: 8px;
-      padding: 18px 20px;
+      background: #0d1322;
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      border-radius: 10px;
+      padding: 20px 22px;
       margin-bottom: 16px;
       transition: all 0.2s ease;
+      position: relative;
+    }
+    .card:hover {
+      border-color: rgba(56, 189, 248, 0.35);
+      background: #10172a;
     }
     .card-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
     .tag {
+      font-family: 'JetBrains Mono', monospace;
       font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
-      padding: 3px 8px;
-      border-radius: 4px;
+      letter-spacing: 0.5px;
+      padding: 3px 9px;
+      border-radius: 5px;
       display: inline-block;
     }
-    .tag-Research { background: #1e1b4b; color: #818cf8; border: 1px solid #3730a3; }
-    .tag-Product { background: #064e3b; color: #34d399; border: 1px solid #065f46; }
-    .tag-OpenSource { background: #4c1d95; color: #c084fc; border: 1px solid #581c87; }
-    .tag-Industry { background: #7c2d12; color: #fb923c; border: 1px solid #9a3412; }
+    .tag-Research { background: rgba(99, 102, 241, 0.15); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.35); }
+    .tag-Product { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.35); }
+    .tag-OpenSource { background: rgba(168, 85, 247, 0.15); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.35); }
+    .tag-Industry { background: rgba(245, 158, 11, 0.15); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.35); }
+    .tag-LabRelease { background: rgba(244, 63, 94, 0.15); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.35); }
 
     .source-name {
-      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
       color: #64748b;
-      font-weight: 500;
+      background: rgba(30, 41, 59, 0.6);
+      padding: 3px 8px;
+      border-radius: 4px;
+      border: 1px solid rgba(148, 163, 184, 0.1);
     }
     .card-title {
-      font-size: 16px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 17px;
       font-weight: 700;
       margin: 6px 0 10px 0;
       line-height: 1.4;
     }
     .card-title a {
-      color: #38bdf8;
+      color: #f8fafc;
       text-decoration: none;
+      transition: color 0.15s ease;
     }
     .card-title a:hover {
-      text-decoration: underline;
+      color: #38bdf8;
+    }
+    .card-title a .arrow {
+      color: #38bdf8;
+      display: inline-block;
+      margin-left: 4px;
+      font-weight: 400;
     }
     .card-summary {
       font-size: 14px;
-      color: #cbd5e1;
-      line-height: 1.6;
+      color: #94a3b8;
+      line-height: 1.65;
       margin: 0;
     }
     .footer {
-      padding: 24px 28px;
-      background: #0f172a;
+      padding: 30px 32px;
+      background: #080c16;
       text-align: center;
       font-size: 12px;
       color: #64748b;
     }
-    .footer p {
-      margin: 4px 0;
+    .github-banner {
+      background: linear-gradient(135deg, rgba(30, 27, 75, 0.4) 0%, rgba(15, 23, 42, 0.7) 100%);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin-bottom: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      text-align: left;
     }
-    .footer-contrib {
-      margin-top: 14px;
-      padding-top: 12px;
-      border-top: 1px solid #334155;
+    .github-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .github-icon-circle {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #a5b4fc;
+      flex-shrink: 0;
+    }
+    .github-title {
+      font-family: 'Outfit', sans-serif;
+      color: #f1f5f9;
+      font-size: 14px;
+      font-weight: 700;
+      margin: 0 0 2px 0;
+    }
+    .github-desc {
       color: #94a3b8;
-      font-size: 13px;
-    }
-    .footer-contrib a {
-      color: #38bdf8;
-      text-decoration: none;
-      font-weight: 600;
-    }
-    .footer-contrib a:hover {
-      text-decoration: underline;
-    }
-    .meta-bar {
-      display: inline-block;
-      background: #1e293b;
-      padding: 6px 14px;
-      border-radius: 20px;
       font-size: 12px;
-      color: #94a3b8;
-      margin-bottom: 12px;
+      margin: 0;
+    }
+    .github-btn {
+      background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+      color: #ffffff !important;
+      text-decoration: none !important;
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 8px 16px;
+      border-radius: 6px;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.35);
+      display: inline-block;
+    }
+    .github-btn:hover {
+      box-shadow: 0 4px 14px rgba(59, 130, 246, 0.5);
+      transform: translateY(-1px);
+    }
+    .footer-note {
+      margin: 6px 0;
+      color: #64748b;
+    }
+    .footer-subnote {
+      margin: 2px 0;
+      font-size: 11px;
+      color: #475569;
+      font-family: 'JetBrains Mono', monospace;
     }
   </style>
 </head>
@@ -195,16 +330,44 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   <div class="wrapper">
     <div class="container">
       
+      <!-- Top Energy Strip -->
+      <div class="energy-bar"></div>
+
       <!-- Header -->
       <div class="header">
-        <span class="header-badge">Executive Briefing</span>
-        <h1>Daily GenAI Intelligence Digest</h1>
-        <p>{{ content.date_str }}</p>
+        <div class="header-top">
+          <span class="header-badge">
+            <span class="pulse-dot"></span>Autonomous AI Radar
+          </span>
+          <span class="system-pill">Gemini-Engineered</span>
+        </div>
+        <h1>Daily GenAI <span class="gradient-text">Intelligence Digest</span></h1>
+        <p class="header-date">
+          <span>⚡ {{ content.date_str }}</span>
+          <span>&bull;</span>
+          <span>Executive Intelligence Pipeline</span>
+        </p>
+
+        <!-- Telemetry Strip -->
+        <div class="telemetry-strip">
+          <span class="telemetry-chip">
+            📡 Feeds: <strong>{{ content.total_sources_scanned }}</strong>
+          </span>
+          <span class="telemetry-chip">
+            ⚡ Ingested: <strong>{{ content.total_items_ingested }}</strong>
+          </span>
+          <span class="telemetry-chip">
+            🎯 Breakthroughs: <strong>{{ content.top_breakthroughs|length }}</strong>
+          </span>
+        </div>
       </div>
 
       <!-- Section 1: Executive Macro Overview -->
       <div class="section">
-        <div class="section-title">⚡ Executive Macro Overview</div>
+        <div class="section-title">
+          <span class="section-title-icon">⚡</span>
+          <span>Executive Macro Radar</span>
+        </div>
         <div class="macro-box">
           {{ content.macro_overview }}
         </div>
@@ -212,16 +375,19 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
       <!-- Section 2: Top Breakthroughs -->
       <div class="section">
-        <div class="section-title">🔥 Top AI Breakthroughs & Key Launches</div>
+        <div class="section-title">
+          <span class="section-title-icon">🔥</span>
+          <span>Core AI Breakthroughs & Key Launches</span>
+        </div>
         {% for story in content.top_breakthroughs %}
         <div class="card">
           <div class="card-header">
             <span class="tag tag-{{ story.tag.replace(' ', '') }}">{{ story.tag }}</span>
             <span class="source-name">{{ story.source }}</span>
           </div>
-          <div class="card-title">
-            <a href="{{ story.url }}" target="_blank" rel="noopener">{{ story.headline }}</a>
-          </div>
+          <h3 class="card-title">
+            <a href="{{ story.url }}" target="_blank" rel="noopener">{{ story.headline }} <span class="arrow">&rarr;</span></a>
+          </h3>
           <p class="card-summary">{{ story.summary }}</p>
         </div>
         {% endfor %}
@@ -230,16 +396,19 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       {% if content.notable_releases %}
       <!-- Section 3: Notable Model & Code Releases -->
       <div class="section">
-        <div class="section-title">📦 Notable Model & Code Releases</div>
+        <div class="section-title">
+          <span class="section-title-icon">📦</span>
+          <span>Notable Model & Code Releases</span>
+        </div>
         {% for release in content.notable_releases %}
         <div class="card">
           <div class="card-header">
             <span class="tag tag-{{ release.tag.replace(' ', '') }}">{{ release.tag }}</span>
             <span class="source-name">{{ release.source }}</span>
           </div>
-          <div class="card-title">
-            <a href="{{ release.url }}" target="_blank" rel="noopener">{{ release.headline }}</a>
-          </div>
+          <h3 class="card-title">
+            <a href="{{ release.url }}" target="_blank" rel="noopener">{{ release.headline }} <span class="arrow">&rarr;</span></a>
+          </h3>
           <p class="card-summary">{{ release.summary }}</p>
         </div>
         {% endfor %}
@@ -248,14 +417,27 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
       <!-- Footer -->
       <div class="footer">
-        <div class="meta-bar">
-          Scanned {{ content.total_items_ingested }} articles across {{ content.total_sources_scanned }} feeds
+        
+        <!-- GitHub Contribution Banner -->
+        <div class="github-banner">
+          <div class="github-info">
+            <div class="github-icon-circle">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+              </svg>
+            </div>
+            <div>
+              <p class="github-title">Open-Source AI Radar</p>
+              <p class="github-desc">Interested in contributing to the code or adding sources?</p>
+            </div>
+          </div>
+          <a href="https://github.com/mrnvenkatesh/ai-alerts" target="_blank" rel="noopener" class="github-btn">
+            Contribute on GitHub &rarr;
+          </a>
         </div>
-        <p>Daily GenAI Intelligence Aggregator &bull; Automated Briefing System</p>
-        <p>Delivered via Scheduled Executive Pipeline</p>
-        <div class="footer-contrib">
-          Interested in contributing to the code? <a href="https://github.com/mrnvenkatesh/ai-alerts" target="_blank" rel="noopener">Contribute on GitHub</a>
-        </div>
+
+        <p class="footer-note">Daily GenAI Intelligence Aggregator &bull; Automated Briefing System</p>
+        <p class="footer-subnote">Delivered via Scheduled Executive Pipeline &bull; Asia/Kolkata</p>
       </div>
 
     </div>
