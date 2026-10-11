@@ -293,6 +293,7 @@ class DigestMailer:
         self.sender_email = (os.getenv("SENDER_EMAIL", "").strip()) or self.smtp_user or "digest@genai.local"
         raw_recipients = os.getenv("RECIPIENT_EMAIL", "")
         self.recipient_list = [r.strip() for r in re.split(r"[,;]", raw_recipients) if r.strip()]
+        self.use_bcc = os.getenv("USE_BCC", "true").strip().lower() in ("true", "1", "yes")
 
     def render_html(self, content: DailyDigestContent) -> str:
         """Renders HTML email template."""
@@ -339,7 +340,13 @@ class DigestMailer:
         msg = MIMEMultipart("alternative")
         msg["Subject"] = subject
         msg["From"] = self.sender_email
-        msg["To"] = ", ".join(self.recipient_list)
+
+        # If BCC is enabled and there are multiple recipients, address the 'To' header
+        # to the sender so recipients do not see each other's email addresses.
+        if self.use_bcc and len(self.recipient_list) > 1:
+            msg["To"] = self.sender_email
+        else:
+            msg["To"] = ", ".join(self.recipient_list)
 
         part1 = MIMEText(text_body, "plain", "utf-8")
         part2 = MIMEText(html_body, "html", "utf-8")
@@ -361,7 +368,8 @@ class DigestMailer:
 
             server.sendmail(self.sender_email, self.recipient_list, msg.as_string())
             server.quit()
-            logger.info(f"Successfully delivered email digest to {len(self.recipient_list)} recipient(s): {', '.join(self.recipient_list)}")
+            delivery_mode = "BCC" if (self.use_bcc and len(self.recipient_list) > 1) else "standard"
+            logger.info(f"Successfully delivered email digest ({delivery_mode}) to {len(self.recipient_list)} recipient(s): {', '.join(self.recipient_list)}")
             return True
         except Exception as e:
             logger.error(f"Failed to deliver email via SMTP: {e}")

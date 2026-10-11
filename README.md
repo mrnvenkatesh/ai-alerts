@@ -120,7 +120,8 @@ OPENAI_API_KEY=your_openai_api_key_here
 
 # SMTP Email Configuration
 SENDER_EMAIL=digest@yourdomain.com
-RECIPIENT_EMAIL=executive@yourdomain.com
+RECIPIENT_EMAIL=user1@yourdomain.com, user2@yourdomain.com
+USE_BCC=true   # When sending to multiple recipients, delivers via BCC to keep email IDs private
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_USER=your_email@gmail.com
