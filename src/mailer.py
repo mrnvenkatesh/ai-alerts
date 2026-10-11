@@ -165,6 +165,21 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     .footer p {
       margin: 4px 0;
     }
+    .footer-contrib {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid #334155;
+      color: #94a3b8;
+      font-size: 13px;
+    }
+    .footer-contrib a {
+      color: #38bdf8;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .footer-contrib a:hover {
+      text-decoration: underline;
+    }
     .meta-bar {
       display: inline-block;
       background: #1e293b;
@@ -238,6 +253,9 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         </div>
         <p>Daily GenAI Intelligence Aggregator &bull; Automated Briefing System</p>
         <p>Delivered via Scheduled Executive Pipeline</p>
+        <div class="footer-contrib">
+          Interested in contributing to the code? <a href="https://github.com/mrnvenkatesh/ai-alerts" target="_blank" rel="noopener">Contribute on GitHub</a>
+        </div>
       </div>
 
     </div>
@@ -279,6 +297,10 @@ RUN METADATA
 --------------------------------------------------------------------
 Ingested {{ content.total_items_ingested }} raw updates from {{ content.total_sources_scanned }} feeds.
 Generated automatically by Daily GenAI Intelligence Aggregator.
+
+CONTRIBUTE
+--------------------------------------------------------------------
+Interested in contributing to the code? https://github.com/mrnvenkatesh/ai-alerts
 """
 
 
